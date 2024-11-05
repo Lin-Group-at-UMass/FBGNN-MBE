@@ -1,0 +1,41 @@
+{
+    "1": {
+        "name": "PhOH_H2O_Mixture_wb97xd3",
+        "source_path": "/nas/zhoulin-nas/Manybody/dataset_202204/PhOH_H2O_Mixture_wb97xd3",
+        "labels": {
+            "2" : ["6", "16", "26"],
+            "3" : ["9", "19", "29", "39"]
+        },
+        "total_moleculars": 20,
+        "start_i": 1,
+        "two_body_num": 1,
+        "three_body_num": 1
+    },
+    
+    "2":{
+        "name": "PhOH_wb97xd3",
+        "source_path": "/nas/zhoulin-nas/Manybody/dataset_202204/PhOH_wb97xd3",
+        "labels": {
+            "2" : ["26"],
+            "3" : ["39"]
+        },
+        "total_moleculars": 9,
+        "start_i": 0,
+        "two_body_num": 0,
+        "three_body_num": 0
+    },
+    
+    "3":{
+        "name": "H2O_2density_MP2",
+        "source_path": "/nas/zhoulin-nas/Manybody/water/H2O_2density_MP2",
+        "labels": {
+            "2" : ["6"],
+            "3" : ["9"]
+        },
+        "total_moleculars": 66,
+        "start_i": 0,
+        "two_body_num": 0,
+        "three_body_num": 0
+    }
+
+}
