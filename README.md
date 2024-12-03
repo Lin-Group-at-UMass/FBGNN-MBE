@@ -9,7 +9,7 @@ Rational design of next-generation functional materials relied on quantitative p
 ## Overall Architecture
 
 <p align="center">
-<img src="[https://github.com/zetayue/MXMNet/blob/master/MXMNet.png?raw=true](https://github.com/Lin-Group-at-UMass/FBGNN-MBE/blob/main/figs/FBGNN-MBE.pptx)">
+<img src="./figs/FBGNN-MBE.jpg">
 </p>
 
 ## Requirements
@@ -44,7 +44,7 @@ Optional arguments:
 ```
 
 ## Cite
-If you find this model and code are useful in your work, please cite our paper:
+If you find this model and code are useful in your work, please cite:
 ```
 @article{chen2024integrating,
   title={Integrating Graph Neural Networks and Many-Body Expansion Theory for Potential Energy Surfaces},
