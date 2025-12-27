@@ -1,6 +1,5 @@
-from .models import PAMNet, PAMNet_s
+from .models import PAMNet
 
 __all__ = [
-    "PAMNet",
-    "PAMNet_s"
+    "PAMNet"
 ]
