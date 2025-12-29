@@ -5,7 +5,7 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 import torch.optim as optim
-from torch_geometric.nn import SchNet, DimeNetPlusPlus, DimeNet, ViSNet, GraphUNet
+from torch_geometric.nn import SchNet, DimeNetPlusPlus, DimeNet, ViSNet
 from torch.nn.utils import clip_grad_norm_
 from torch_geometric.data import DataLoader
 from warmup_scheduler import GradualWarmupScheduler
@@ -14,11 +14,13 @@ from model import MXMNet, Config, Config_GNN
 from file_utils import save_to_file, name_with_datetime
 from mixed_body_dataset import MixedBodyDS
 from tqdm import tqdm
-from pamnet import PAMNet, PAMNet_s
+from pamnet import PAMNet
 import time
 from tool_utils import log_de_normalized
 from sklearn.metrics import r2_score, mean_squared_error, mean_absolute_error
 import os
+
+
 class EarlyStopper:
     def __init__(self, patience=1, min_delta=0):
         self.patience = patience
@@ -35,6 +37,7 @@ class EarlyStopper:
             if self.counter >= self.patience:
                 return True
         return False
+
 
 def test(loader, ema, model, device):
     total_error = 0
@@ -82,6 +85,7 @@ def test(loader, ema, model, device):
 def msd(y_true, y_pred):
     return (y_pred - y_true).mean()
 
+
 def test_formse(y_predict, y_true, max_val, min_val):
 
     # y_predict = np.concatenate(y_predict, axis=0)
@@ -100,61 +104,42 @@ def test_formse(y_predict, y_true, max_val, min_val):
         'mae': mae,
         'r2': r2,
     }
+    
 
 def get_model(args, device):
-    config = Config(dim=args.dim, 
-                    n_layer=args.n_layer,
-                    cutoff_l=args.cutoff_l,
-                    cutoff_g=args.cutoff_g)
-    
-    model = args.model
-    print("XXXXXX",model)
     global test_models
-    test_models = False
-    if model == 'pamnet':
-        test_models = False
-        model = PAMNet(config).to(device)
-    elif model == 'pamnet_s':
-        test_models = False
-        model = PAMNet_s(config).to(device)
-    elif model == 'SchNet':
+    
+    # 1. PyG models (test_models = True)
+    if args.model in ['SchNet', 'DimeNet', 'DimeNet++', 'ViSNet']:
         test_models = True
-        model = SchNet(hidden_channels=args.dim,
-                        num_interactions=args.n_layer,
-                        cutoff=args.cutoff_g,).to(device)
-    elif model == 'DimeNet':
-        test_models = True
-        model = DimeNet(hidden_channels=args.dim,
-                        out_channels=1,
-                        num_blocks=args.n_layer,
-                        cutoff=args.cutoff_g,
-                        num_bilinear=8,
-                        num_spherical=7,
-                        num_radial=6,).to(device)
-    elif model == 'DimeNet++':
-        test_models = True
-        model = DimeNetPlusPlus(hidden_channels=args.dim,
-                                out_channels=1,
-                                num_blocks=args.n_layer,
-                                cutoff=args.cutoff_g,
-                                int_emb_size=64,
-                                basis_emb_size=8,
-                                out_emb_channels=256,
-                                num_spherical=7,
-                                num_radial=6,).to(device)
-    elif model == 'ViSNet':
-        test_models = True
-        print("xxxxxx")
-        model = ViSNet(hidden_channels=args.dim,
-                       num_layers=args.n_layer,
-                       cutoff=args.cutoff_g).to(device)
+        
+        if args.model == 'SchNet':
+            model = SchNet(hidden_channels=args.dim, num_interactions=args.n_layer, cutoff=args.cutoff_g)
+        elif args.model == 'ViSNet':
+            model = ViSNet(hidden_channels=args.dim, num_layers=args.n_layer, cutoff=args.cutoff_g)
+        elif args.model == 'DimeNet':
+            model = DimeNet(hidden_channels=args.dim, out_channels=1, num_blocks=args.n_layer, 
+                            cutoff=args.cutoff_g, num_bilinear=8, num_spherical=7, num_radial=6)
+        elif args.model == 'DimeNet++':
+            model = DimeNetPlusPlus(hidden_channels=args.dim, out_channels=1, num_blocks=args.n_layer, 
+                                    cutoff=args.cutoff_g, int_emb_size=64, basis_emb_size=8, 
+                                    out_emb_channels=256, num_spherical=7, num_radial=6)
+
+    # 2. User defined models (test_models = False): use Config
     else:
         test_models = False
-        model = MXMNet(config).to(device)
-    print(test_models)
-    print(f'Loaded model: {args.model}')
-    return model
+        config = Config(dim=args.dim, n_layer=args.n_layer, 
+                        cutoff_l=args.cutoff_l, cutoff_g=args.cutoff_g)
+        
+        if args.model == 'pamnet':
+            model = PAMNet(config)
+        else:
+            model = MXMNet(config)
 
+    print(f'Loaded model: {args.model}')
+    return model.to(device)
+    
+    
 def get_folder(args):
     folder = f'results/ds_{args.dataset}/{args.model}'
     if not os.path.exists(folder):
@@ -186,7 +171,7 @@ def run_model(train_loader, test_loader, val_loader, train_dataset_len, args, de
     early_stopper = EarlyStopper(patience=10, min_delta=0.000001)
     if args.debug:
         args.epochs = 5
-    print(22222)
+
     for epoch in tqdm(range(args.epochs)):
         loss_all = 0
         step = 0
@@ -196,19 +181,13 @@ def run_model(train_loader, test_loader, val_loader, train_dataset_len, args, de
             data = data.to(device)
 
             optimizer.zero_grad()
-            print(test_models)
             if test_models:
-                print(33333)
                 z = data.x.squeeze()
                 pos = data.pos
                 batch = getattr(data, 'batch', None)
                 output = model(z, pos, batch).view(-1)
-                print(44444)
             else:
-                print(3333)
                 output = model(data)
-                print(4444)
-            print(55555)
             loss = F.l1_loss(output, data.y)
             loss_all += loss.item() * data.num_graphs
             loss.backward()
@@ -278,8 +257,6 @@ def run_model(train_loader, test_loader, val_loader, train_dataset_len, args, de
     return results
 
 def get_min_max(labels, train_path, test_path, val_path):
-    # may need to be adjusted with labels
-    # need to be refactored
     train = np.load(train_path, allow_pickle=True)
     test = np.load(test_path, allow_pickle=True)
     val = np.load(val_path, allow_pickle=True)
@@ -340,9 +317,7 @@ def runs(labels, n_body, args, device, dataset_name):
     start_time = time.time()
     
     key = name_with_datetime(key)
-    print(11111)
     results = run_model(train_loader, test_loader, val_loader, len(train_dataset), args, device, key)
-    print(22222)
     end_time = time.time()
     
     results['duration'] = end_time - start_time
