@@ -13,17 +13,17 @@ Rational design of next-generation functional materials relied on quantitative p
 </p>
 
 ## 🛠 How to Run
-Environment:
+1. Environment:
 ```
 conda env create -f env.yml
 ```
-You can directly download, preprocess the water, phenol, or mixture dataset and train the model with 
+2. Train the model with:
 ```
 python train.py --dataset X --n_body X  --n_layer X --cutoff_l X --cutoff_g X (X are numbers)
 ```
-For example (water, 2 body),
+For example (water, 2 body)
 ```
-python train.py --dataset 3 --n_body 2  --n_layer 6 --cutoff_l 1.7 --cutoff_g 5 
+python train.py --dataset 3 --n_body 2  --n_layer 6 --cutoff_l 5 --cutoff_g 10 
 ```
 Optional arguments:
 ```
@@ -40,6 +40,43 @@ Optional arguments:
   --cutoff_g        distance cutoff used in the global layer
   --model           MXMNet, or PAMNet
 ```
+4. Teacher-student knowledge diatillation:
+Train mode
+```
+python train_student_new.py --mode train --dataset X --n_body X  --teacher_checkpoint ./ckpt/XXX.pt  --student_model X --feature_loss_weight X --hidden_dim X --num_layers X
+```
+Predict mode
+```
+python train_student_new.py --mode predict  --student_model X --hidden_dim X --num_layers X  --model_path ./pes_results/model_dimenet_XXX.pt --norm_stats_path ./pes_results/norm_stats_XXX.npy --predict_data_path ../dataset/XXX/XXX.npz
+```
+For example
+```
+python train_student_new.py --mode train --dataset h2o_21 --n_body 2  --teacher_checkpoint ./ckpt/stage_3_FullDataset_ep796_r20.7532.pt  --student_model dimenet --feature_loss_weight 0.01 --hidden_dim 256 --num_layers 2
+
+python train_student_new.py --mode predict  --student_model dimenet --hidden_dim 256 --num_layers 2  --model_path ./pes_results/model_dimenet_h2o_21_2body_h256_l2_20260415_161002.pt --norm_stats_path ./pes_results/norm_stats_dimenet_h2o_21_2body_h256_l2_20260415_161002.npy --predict_data_path ../dataset/h2o_7/h2o_7_2body_energy_application.npz
+```
+Optional arguments:
+```
+  --distill_epochs       number of epochs to distill
+  --ft_epochs            number of epochs to fine-tune
+  --distill_lr           distillation learning rate
+  --ft_lr                fine-tuning learning rate
+  --num_layers           number of hidden layers
+  --n_body               2 for 2body, 3 for 3body
+  --dataset              name of the dataset
+  --hidden_dim           size of input hidden units
+  --batch_size           batch size
+  --cutoff_l             distance cutoff used in the local layer
+  --cutoff_g             distance cutoff used in the global layer
+  --student_model        DimeNet, DimeNet++, VisNet or SchNet
+  --feature_loss_weight  λ for feature MSE during distillation)
+  --distill_layer        which teacher layer to distill (-1 = last)
+  --teacher_checkpoint   Path to the trained teacher model file (PyTorch .pt)
+  --model_path           Path to the trained student model file (PyTorch .pt)
+  --norm_stats_path      Path to the saved normalization parameters (NumPy .npy)
+  --predict_data_path    Path to the prediction dataset (.npz) 
+```
+
 
 ## ✍ Citation
 If you find this model and code are useful in your work, please cite:
