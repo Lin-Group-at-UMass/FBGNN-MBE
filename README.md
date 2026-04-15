@@ -9,7 +9,7 @@ Rational design of next-generation functional materials relied on quantitative p
 ## Overall Architecture
 
 <p align="center">
-<img src="./figs/FBGNN-MBE.jpg">
+<img src="./figs/FBGNN-MBE.png">
 </p>
 
 ## 🛠 Environment Setup
@@ -28,42 +28,72 @@ Optional arguments:
 ```
   --gpu             GPU number
   --seed            random seed
+  --model           MXMNet, or PAMNet
+  --n_body          2 for 2body, 3 for 3body
+  --dataset         name of the dataset
   --epochs          number of epochs to train
   --lr              initial learning rate
   --n_layer         number of hidden layers
-  --n_body          2 for 2body, 3 for 3body
-  --dataset         name of the dataset
   --dim             size of input hidden units
   --batch_size      batch size
   --cutoff_l        distance cutoff used in the local layer
   --cutoff_g        distance cutoff used in the global layer
-  --model           MXMNet, or PAMNet
 ```
 ## 🛠 Multi-stage Training
-## 🛠 Teacher-student knowledge diatillation
 Train mode
 ```
-python train_student_new.py --mode train --dataset X --n_body X  --teacher_checkpoint ./ckpt/XXX.pt  --student_model X --feature_loss_weight X --hidden_dim X --num_layers X
+python train_energy_staged.py --mode train --model X --dataset X --n_body X --n_layer X --dim X --lr_s1 X --lr_s2 X --lr_s3 X --batch_size X --patience X 
 ```
-Predict mode
+Predict mode - on test set
 ```
-python train_student_new.py --mode predict  --student_model X --hidden_dim X --num_layers X  --model_path ./pes_results/model_dimenet_XXX.pt --norm_stats_path ./pes_results/norm_stats_XXX.npy --predict_data_path ../dataset/XXX/XXX.npz
+python train_energy_staged.py --mode predict --model X --dataset X --n_body X --checkpoint ./ckpt/XXX.pt  
 ```
 For example
 ```
-python train_student_new.py --mode train --dataset h2o_21 --n_body 2  --teacher_checkpoint ./ckpt/stage_3_FullDataset_ep796_r20.7532.pt  --student_model dimenet --feature_loss_weight 0.01 --hidden_dim 256 --num_layers 2
+python train_energy_staged.py --mode train --model pamnet --dataset mix --n_body 2 --n_layer 3 --dim 128 --lr_s1 1e-4 --lr_s2 1e-4 --lr_s3 1e-5 --batch_size 128 --patience 50 
 
-python train_student_new.py --mode predict  --student_model dimenet --hidden_dim 256 --num_layers 2  --model_path ./pes_results/model_dimenet_h2o_21_2body_h256_l2_20260415_161002.pt --norm_stats_path ./pes_results/norm_stats_dimenet_h2o_21_2body_h256_l2_20260415_161002.npy --predict_data_path ../dataset/h2o_7/h2o_7_2body_energy_application.npz
+python train_energy_staged.py --mode predict --model pamnet --dataset mix --n_body 2 --checkpoint ./ckpt/mix_pamnet_2b_staged/stage_3_FullDataset_ep796_r20.7532.pt  
 ```
 Optional arguments:
 ```
+  --mode                 train or predict
+  --model                MXMNet, or PAMNet
+  --n_body               2 for 2body, 3 for 3body
+  --dataset              name of the dataset
+  --n_layer              number of hidden layers
+  --dim                  size of input hidden units
+  --batch_size           batch size
+  --epochs_s1, --lr_s1   Stage 1 epochs and LR
+  --epochs_s2, --lr_s2   Stage 2 epochs and LR
+  --epochs_s3, --lr_s3   Stage 3 epochs and LR
+  --patience             early stopping patience used in each stage
+  --checkpoint           required for predict mode
+```
+## 🛠 Teacher-student knowledge diatillation
+Train mode
+```
+python train_student.py --mode train --dataset X --n_body X  --teacher_checkpoint ./ckpt/XXX.pt  --student_model X --feature_loss_weight X --hidden_dim X --num_layers X
+```
+Predict mode
+```
+python train_student.py --mode predict  --student_model X --hidden_dim X --num_layers X  --model_path ./pes_results/model_dimenet_XXX.pt --norm_stats_path ./pes_results/norm_stats_XXX.npy --predict_data_path ../dataset/XXX/XXX.npz
+```
+For example
+```
+python train_student.py --mode train --dataset h2o_21 --n_body 2  --teacher_checkpoint ./ckpt/stage_3_FullDataset_ep796_r20.7532.pt  --student_model dimenet --feature_loss_weight 0.01 --hidden_dim 256 --num_layers 2
+
+python train_student.py --mode predict  --student_model dimenet --hidden_dim 256 --num_layers 2  --model_path ./pes_results/model_dimenet_h2o_21_2body_h256_l2_20260415_161002.pt --norm_stats_path ./pes_results/norm_stats_dimenet_h2o_21_2body_h256_l2_20260415_161002.npy --predict_data_path ../dataset/h2o_7/h2o_7_2body_energy_application.npz
+```
+Optional arguments:
+```
+  --mode                 train or predict
+  --n_body               2 for 2body, 3 for 3body
+  --dataset              name of the dataset
   --distill_epochs       number of epochs to distill
   --ft_epochs            number of epochs to fine-tune
   --distill_lr           distillation learning rate
   --ft_lr                fine-tuning learning rate
   --num_layers           number of hidden layers
-  --n_body               2 for 2body, 3 for 3body
-  --dataset              name of the dataset
   --hidden_dim           size of input hidden units
   --batch_size           batch size
   --cutoff_l             distance cutoff used in the local layer
