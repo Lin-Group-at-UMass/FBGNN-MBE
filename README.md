@@ -12,12 +12,11 @@ Rational design of next-generation functional materials relied on quantitative p
 <img src="./figs/FBGNN-MBE.jpg">
 </p>
 
-## 🛠 How to Run
-1. Environment:
+## 🛠 Environment Setup
 ```
 conda env create -f env.yml
 ```
-2. Train the model with:
+## 🛠 Single-stage Training
 ```
 python train.py --dataset X --n_body X  --n_layer X --cutoff_l X --cutoff_g X (X are numbers)
 ```
@@ -40,7 +39,8 @@ Optional arguments:
   --cutoff_g        distance cutoff used in the global layer
   --model           MXMNet, or PAMNet
 ```
-4. Teacher-student knowledge diatillation:
+## 🛠 Multi-stage Training
+## 🛠 Teacher-student knowledge diatillation
 Train mode
 ```
 python train_student_new.py --mode train --dataset X --n_body X  --teacher_checkpoint ./ckpt/XXX.pt  --student_model X --feature_loss_weight X --hidden_dim X --num_layers X
