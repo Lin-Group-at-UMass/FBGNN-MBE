@@ -1,10 +1,8 @@
-# Integrating Graph Neural Networks and Many-Body Expansion Theory for Potential Energy Surfaces
+# FB-GNN-MBE Source Code
 
-Code for the FBGNN-MBE in our paper [Integrating Graph Neural Networks and Many-Body Expansion Theory for Potential Energy Surfaces](https://arxiv.org/abs/2411.01578), which has been accepted by the AI for Accelerated Materials Design Workshop ([AI4Mat-NeurIPS 2024](https://sites.google.com/view/ai4mat)) at the 38th Conference on Neural Information Processing Systems ([NeurIPS 2024](https://neurips.cc/Conferences/2024)).
-
-## 📚 Abstract
-
-Rational design of next-generation functional materials relied on quantitative predictions of their electronic structures beyond single building blocks. First-principles quantum mechanical (QM) modeling became infeasible as the size of a material grew beyond hundreds of atoms. In this study, we developed a new computational tool integrating fragment-based graph neural networks (FBGNN) into the fragment-based many-body expansion (MBE) theory, referred to as FBGNN-MBE, and demonstrated its capacity to reproduce full-dimensional potential energy surfaces (FD-PES) for hierarchic chemical systems with manageable accuracy, complexity, and interpretability. In particular, we divided the entire system into basic building blocks (fragments), evaluated their single-fragment energies using a first-principles QM model and attacked many-fragment interactions using the structure–property relationships trained by FBGNNs. Our development of FBGNN-MBE demonstrated the potential of a new framework integrating deep learning models into fragment-based QM methods, and marked a significant step towards computationally aided design of large functional materials.
+Code for the FB-GNN-MBE method, published in two papers
+[1] S. Chen et al. Integrating Graph Neural Networks and Many-Body Expansion Theory for Potential Energy Surfaces, NeurIPS'2024 AI4Mat Workshop [https://neurips.cc/virtual/2024/103728]
+[2] S. Chen et al. Transferable FB-GNN-MBE Framework for Potential Energy Surfaces: Data-Adaptive Transfer Learning in Deep Learned Many-Body Expansion Theory, under review with J. Chem. Phys. [https://doi.org/10.48550/arXiv.2604.09320]
 
 ## Overall Architecture
 
@@ -112,9 +110,17 @@ Optional arguments:
 If you find this model and code are useful in your work, please cite:
 ```bibtex
 @article{chen2024integrating,
-  title={Integrating Graph Neural Networks and Many-Body Expansion Theory for Potential Energy Surfaces},
-  author={Chen, Siqi and Wang, Zhiqiang and Deng, Xianqi and Shen, Yili and Ju, Cheng-Wei and Yi, Jun and Xiong, Lin and Ling, Guo and Alhmoud, Dieaa and Guan, Hui and others},
-  journal={arXiv preprint arXiv:2411.01578},
-  year={2024}
+title={Integrating Graph Neural Networks and Many-Body Expansion Theory for Potential Energy Surfaces},
+author={Chen, Siqi and Wang, Zhiqiang and Deng, Xianqi and Shen, Yili and Ju, Cheng-Wei and Yi, Jun and Xiong, Lin and Ling, Guo and Alhmoud, Dieaa and Guan, Hui and Lin, Zhou},
+journal={arXiv preprint arXiv:2411.01578},
+year={2024}
+}
+```
+```
+@article{chen2026transferable,
+title={Transferable FB-GNN-MBE Framework for Potential Energy Surfaces: Data-Adaptive Transfer Learning in Deep Learned Many-Body Expansion Theory},
+author={Chen, Siqi and Wang, Zhiqiang and Shen, Yili and Deng, Xianqi and Cheng, Xi and Ju, Cheng-Wei and Yi, Jun and Ling, Guo and Alhmoud, Dieaa and Guan, Hui and Lin, Zhou},
+journal={arXiv preprint arXiv:2604.09320},
+year={2026}
 }
 ```
